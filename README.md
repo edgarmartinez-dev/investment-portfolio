@@ -9,9 +9,27 @@ match a reference design 1:1. No build step, no dependencies.
 Open `index.html` in any browser. It is sized for a ~430px-wide mobile viewport
 (centered on larger screens).
 
+## Install (PWA)
+
+This is an installable Progressive Web App. Because service workers require a
+secure context, serve it over HTTPS (e.g. GitHub Pages) or `localhost`:
+
+```bash
+python3 -m http.server 8000
+# then open http://127.0.0.1:8000/
+```
+
+- **Desktop Chrome/Edge:** click the install icon in the address bar.
+- **iOS Safari:** Share → "Add to Home Screen".
+- **Android Chrome:** menu → "Install app".
+
+It works offline after the first load (assets are cached by `sw.js`).
+
 ## Features
 
-- Pure HTML + inline CSS, all icons hand-built as inline SVG (no icon fonts).
+- Single self-contained `index.html` — icons, flag, and Trade button are PNGs
+  cut from the reference and embedded as base64 (no external image requests).
+- Installable PWA: web manifest, service worker, and app icons (incl. maskable).
 - Portfolio value header with Today / Total performance.
 - Holdings table (TSLA, VOO) with sortable column indicators.
 - Cash balances row with USD flag and quick actions.
