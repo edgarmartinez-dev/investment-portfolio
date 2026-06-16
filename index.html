@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="data-loading">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -29,6 +29,16 @@
   /* negative (loss) coloring for live data */
   .vals .neg{ color:var(--red); }
   .pl.neg .p, .pl.neg .pct{ color:var(--red); }
+  /* hide live numbers until real data is applied (no flash of placeholders);
+     layout is preserved because the placeholder text still reserves space */
+  .data-loading #pvAmount,
+  .data-loading #todayVal,
+  .data-loading #totalVal,
+  .data-loading #cashAmt,
+  .data-loading .row .v,
+  .data-loading .row .s,
+  .data-loading .row .p,
+  .data-loading .row .pct{ visibility:hidden; }
 
   html,body{
     background:#ffffff;
@@ -240,6 +250,7 @@
   .tradeimg{ height:58px;width:auto;display:block; }
   .avatarimg{ width:28px;height:28px;display:block;border-radius:50%; }
 </style>
+<noscript><style>html.data-loading *{ visibility:visible !important; }</style></noscript>
 </head>
 <body>
 <div class="phone">
@@ -403,10 +414,27 @@
       if (typeof d.cash === 'number') set(document.getElementById('cashAmt'), fmtK(d.cash));
     }
 
+    var reveal = function () { document.documentElement.classList.remove('data-loading'); };
+
+    // 1) Instantly show the last-known values from cache (no flash to defaults).
+    var hadCache = false;
+    try {
+      var cached = localStorage.getItem('portfolio');
+      if (cached) { render(JSON.parse(cached)); reveal(); hadCache = true; }
+    } catch (e) {}
+
+    // 2) Fetch the latest, update the screen, and cache it for next reload.
     fetch('data/portfolio.json', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(render)
-      .catch(function () { /* keep static placeholder values */ });
+      .then(function (d) {
+        render(d);
+        reveal();
+        try { localStorage.setItem('portfolio', JSON.stringify(d)); } catch (e) {}
+      })
+      .catch(function () { if (!hadCache) reveal(); /* show static fallback */ });
+
+    // 3) Safety net: never stay hidden for long if something stalls.
+    setTimeout(reveal, 4000);
   })();
 </script>
 </body>
