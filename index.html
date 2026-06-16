@@ -574,9 +574,51 @@
     var reveal = function () { document.documentElement.classList.remove('data-loading'); };
 
     // Fetch the latest snapshot, update the screen, and cache it for next load.
+    var LIVE_MAX_AGE = 15 * 60 * 1000; // only fetch live prices if data is older than this
+    function getKey() { try { return (localStorage.getItem('quoteKey') || '').trim(); } catch (e) { return ''; } }
+    function ageMs(d) { var t = d && d.updatedAt ? new Date(d.updatedAt).getTime() : 0; return Date.now() - t; }
+    function readCache() { try { return JSON.parse(localStorage.getItem('portfolio') || 'null'); } catch (e) { return null; } }
+
+    // Overlay live quotes (Finnhub) onto the committed snapshot and recompute.
+    function liveEnrich(base) {
+      var key = getKey();
+      if (!key || !base || !base.holdings || !base.holdings.length) return Promise.resolve(base);
+      return Promise.all(base.holdings.map(function (h) {
+        return fetch('https://finnhub.io/api/v1/quote?symbol=' + encodeURIComponent(h.symbol) + '&token=' + encodeURIComponent(key))
+          .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      })).then(function (qs) {
+        if (!qs.every(function (q) { return q && q.c; })) return base; // any failure -> keep committed
+        var d = JSON.parse(JSON.stringify(base)), tv = 0, tp = 0, ti = 0;
+        d.holdings.forEach(function (h, i) {
+          var q = qs[i], pc = q.pc || h.prevClose || q.c;
+          h.price = q.c; h.prevClose = pc;
+          h.value = q.c * h.shares;
+          h.pl = h.value - h.invested;
+          h.plPct = h.invested ? (h.pl / h.invested) * 100 : 0;
+          h.dayChange = (q.c - pc) * h.shares;
+          h.dayChangePct = pc ? ((q.c - pc) / pc) * 100 : 0;
+          tv += h.value; tp += pc * h.shares; ti += h.invested;
+        });
+        var cash = d.cash || 0;
+        d.holdingsValue = tv; d.totalValue = tv + cash; d.totalInvested = ti;
+        d.today = { change: tv - tp, changePct: tp ? ((tv - tp) / tp) * 100 : 0 };
+        d.total = { change: tv - ti, changePct: ti ? ((tv - ti) / ti) * 100 : 0 };
+        d.updatedAt = new Date().toISOString();
+        d.live = true;
+        return d;
+      });
+    }
+
+    // Fetch committed snapshot; refresh live prices only if data is >15 min old.
     function refreshData() {
       return fetch('data/portfolio.json', { cache: 'no-store' })
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (committed) {
+          var cached = readCache();
+          var base = (cached && committed && new Date(cached.updatedAt) > new Date(committed.updatedAt)) ? cached : committed;
+          if (getKey() && ageMs(base) > LIVE_MAX_AGE) return liveEnrich(committed);
+          return base;
+        })
         .then(function (d) {
           render(d);
           reveal();
@@ -624,9 +666,15 @@
     var btn = document.getElementById('refreshBtn');
     var box = document.querySelector('.refresh');
     if (btn) {
-      var busy = false;
+      var busy = false, askedKey = false;
       btn.addEventListener('click', function () {
         if (busy) return;
+        // Offer to set up live prices once, if no key is stored yet.
+        if (!getKey() && !askedKey) {
+          askedKey = true;
+          var k = window.prompt('Paste a free Finnhub API key for live prices (get one at finnhub.io).\nLeave blank to keep using the scheduled updates.');
+          if (k && k.trim()) { try { localStorage.setItem('quoteKey', k.trim()); } catch (e) {} }
+        }
         busy = true;
         if (box) box.classList.add('spinning');
         if ('serviceWorker' in navigator && navigator.serviceWorker.getRegistration) {

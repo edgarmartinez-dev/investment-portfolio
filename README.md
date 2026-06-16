@@ -54,6 +54,22 @@ To record a buy/sell, adjust `shares` and `invested` accordingly (e.g. buying
 $1,000 more: add the shares bought and add `1000` to `invested`; selling:
 reduce both). Total P&L is `current value − invested`.
 
+### Optional: live prices in the browser
+
+Because GitHub's scheduled runs are best-effort (often delayed), the app can
+also fetch **live** quotes itself via [Finnhub](https://finnhub.io) (free,
+CORS-friendly):
+
+1. Sign up at finnhub.io and copy your free API key.
+2. In the app, tap the **refresh** button — it prompts once for the key and
+   stores it in `localStorage` (on your device only; **not** committed to this
+   public repo).
+
+After that, opening the app or tapping refresh overlays live prices onto the
+committed snapshot — but only if the data is **older than 15 minutes**, so it
+never hammers the API. Without a key it just uses the scheduled snapshot. The
+cron still runs to record daily history.
+
 ### Running the updater manually
 
 ```bash

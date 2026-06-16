@@ -1,6 +1,6 @@
 // App version (semver). Bump to ship updates and bust the old cache:
 // patch (x.x.+1) for fixes, minor (x.+1.0) for features, major for big changes.
-const VERSION = '7.2.0';
+const VERSION = '7.3.0';
 const CACHE = 'portfolio-' + VERSION;
 const ASSETS = [
   './',
@@ -30,6 +30,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
+
+  // Don't touch cross-origin requests (e.g. the live quote API) — pass through.
+  if (url.origin !== self.location.origin) return;
 
   // Live data: network-first so prices stay fresh; fall back to cache offline.
   if (url.pathname.includes('/data/') && url.pathname.endsWith('.json')) {
