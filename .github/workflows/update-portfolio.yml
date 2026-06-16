@@ -35,7 +35,17 @@ jobs:
           git add data/portfolio.json data/history.json
           if git diff --cached --quiet; then
             echo "No data changes."
-          else
-            git commit -m "chore: update portfolio data [skip ci]"
-            git push
+            exit 0
           fi
+          git commit -m "chore: update portfolio data [skip ci]"
+          # Retry to survive races (manual pushes / overlapping runs); on
+          # conflict in the generated data files, our fresh data wins (-X theirs).
+          for i in 1 2 3 4 5; do
+            if git push; then
+              echo "pushed"; exit 0
+            fi
+            echo "push rejected, syncing with remote (attempt $i)…"
+            git pull --rebase -X theirs origin main || true
+            sleep $((RANDOM % 4 + 2))
+          done
+          echo "::error::could not push after retries"; exit 1
