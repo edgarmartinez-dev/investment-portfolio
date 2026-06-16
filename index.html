@@ -24,7 +24,11 @@
     --grey-light:#b9bcc0;
     --line:#ededed;
     --blue:#1d5bf0;
+    --red:#e0314b;
   }
+  /* negative (loss) coloring for live data */
+  .vals .neg{ color:var(--red); }
+  .pl.neg .p, .pl.neg .pct{ color:var(--red); }
 
   html,body{
     background:#ffffff;
@@ -258,11 +262,11 @@
       <div class="pv-label">Portfolio Value
         <span class="circle-i info" style="width:18px;height:18px;border-width:1.3px;font-size:11px;">i</span>
       </div>
-      <div class="pv-amount">52.3K</div>
+      <div class="pv-amount" id="pvAmount">52.3K</div>
     </div>
     <div class="totals">
       <div class="labels">Today<br>Total</div>
-      <div class="vals">76&nbsp;(+0.03%)<br>15.5K&nbsp;(+44.6%)</div>
+      <div class="vals"><span id="todayVal">76&nbsp;(+0.03%)</span><br><span id="totalVal">15.5K&nbsp;(+44.6%)</span></div>
       <div class="chev">&rsaquo;</div>
     </div>
   </div>
@@ -284,7 +288,7 @@
 
   <!-- holdings list -->
   <div class="holdings-list">
-    <div class="row">
+    <div class="row" data-sym="TSLA">
       <div class="inst">
         <div class="tkr">TSLA<span class="ex">NASDAQ.NMS</span></div>
         <div class="name">TESLA INC</div>
@@ -299,7 +303,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" data-sym="VOO">
       <div class="inst">
         <div class="tkr">VOO<span class="ex">ARCA</span></div>
         <div class="name">VANGUARD S&amp;P 50&hellip;</div>
@@ -326,7 +330,7 @@
       <div class="cur">USD</div>
       <div class="sub">United States dollar</div>
     </div>
-    <div class="cash-amt">$25</div>
+    <div class="cash-amt" id="cashAmt">$25</div>
     <div class="dots"><i></i><i></i><i></i></div>
   </div>
 
@@ -348,6 +352,62 @@
       navigator.serviceWorker.register('sw.js').catch(function () {});
     });
   }
+</script>
+<script>
+  /* Live portfolio data. Falls back silently to the static markup if the
+     data file isn't available (e.g. before the first cron run / offline). */
+  (function () {
+    var fmtMoney = function (v) { return '$' + Math.round(v).toLocaleString('en-US'); };
+    var fmtK = function (v) {
+      var a = Math.abs(v), s = v < 0 ? '-' : '';
+      if (a >= 1000) return s + (a / 1000).toFixed(a >= 100000 ? 0 : (a >= 10000 ? 1 : 2)) + 'K';
+      return s + Math.round(a).toLocaleString('en-US');
+    };
+    var fmtNum = function (v) {
+      return Math.abs(v) < 1000 ? v.toFixed(2) : Math.round(v).toLocaleString('en-US');
+    };
+    var fmtPct = function (v) {
+      var s = v >= 0 ? '+' : '';
+      return s + (Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(1)) + '%';
+    };
+    var set = function (el, txt) { if (el) el.textContent = txt; };
+
+    function render(d) {
+      set(document.getElementById('pvAmount'), fmtK(d.totalValue));
+
+      var today = document.getElementById('todayVal');
+      if (today && d.today) {
+        today.innerHTML = (d.today.change < 0 ? '-' : '') +
+          Math.round(Math.abs(d.today.change)).toLocaleString('en-US') +
+          ' (' + fmtPct(d.today.changePct) + ')';
+        today.classList.toggle('neg', d.today.change < 0);
+      }
+      var total = document.getElementById('totalVal');
+      if (total && d.total) {
+        total.innerHTML = fmtK(d.total.change) + ' (' + fmtPct(d.total.changePct) + ')';
+        total.classList.toggle('neg', d.total.change < 0);
+      }
+
+      (d.holdings || []).forEach(function (h) {
+        var row = document.querySelector('.row[data-sym="' + h.symbol + '"]');
+        if (!row) return;
+        set(row.querySelector('.vs .v'), fmtMoney(h.value));
+        set(row.querySelector('.vs .s'), Number(h.shares).toFixed(4));
+        if (h.name) set(row.querySelector('.inst .name'), h.name);
+        var pl = row.querySelector('.pl');
+        set(row.querySelector('.pl .p'), fmtNum(h.pl));
+        set(row.querySelector('.pl .pct'), fmtPct(h.plPct).replace('+', ''));
+        if (pl) pl.classList.toggle('neg', h.pl < 0);
+      });
+
+      if (typeof d.cash === 'number') set(document.getElementById('cashAmt'), fmtK(d.cash));
+    }
+
+    fetch('data/portfolio.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(render)
+      .catch(function () { /* keep static placeholder values */ });
+  })();
 </script>
 </body>
 </html>

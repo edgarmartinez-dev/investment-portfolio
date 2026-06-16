@@ -25,6 +25,46 @@ python3 -m http.server 8000
 
 It works offline after the first load (assets are cached by `sw.js`).
 
+## Live data
+
+Prices are pulled from a **keyless** source (Yahoo Finance, with Stooq as a
+fallback — no API key or secret needed). A GitHub Actions cron job runs
+`scripts/update-portfolio.mjs` ~hourly and commits the results, which
+DigitalOcean then auto-deploys. The frontend reads `data/portfolio.json` on
+load (and falls back to the static placeholder values if it's unavailable).
+
+Data files:
+
+- `data/holdings.json` — **your editable config**: shares, cost basis
+  (`invested`), and cash. This is the source of truth.
+- `data/portfolio.json` — generated snapshot the UI reads (current prices,
+  values, day change, total P&L).
+- `data/history.json` — one entry per day (the current day is updated in place),
+  for charting value over time.
+
+### Editing your portfolio
+
+Edit `data/holdings.json`:
+
+- **`shares`** — number of shares held.
+- **`invested`** — total amount you paid (cost basis) for that holding.
+- **`cash`** — cash balance.
+
+To record a buy/sell, adjust `shares` and `invested` accordingly (e.g. buying
+$1,000 more: add the shares bought and add `1000` to `invested`; selling:
+reduce both). Total P&L is `current value − invested`.
+
+### Running the updater manually
+
+```bash
+node scripts/update-portfolio.mjs   # Node 18+
+```
+
+Or trigger the workflow from the GitHub **Actions** tab (“Update portfolio
+data” → Run workflow). To swap to a keyed provider (e.g. Finnhub) for higher
+reliability, replace the `quoteYahoo`/`quoteStooq` functions and add the key as
+a repo secret referenced in the workflow.
+
 ## Features
 
 - Single self-contained `index.html` — icons, flag, and Trade button are PNGs

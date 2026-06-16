@@ -1,4 +1,4 @@
-const CACHE = 'portfolio-v3';
+const CACHE = 'portfolio-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -6,7 +6,8 @@ const ASSETS = [
   './icon-192.png',
   './icon-512.png',
   './icon-512-maskable.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './data/portfolio.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -25,6 +26,23 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+
+  // Live data: network-first so prices stay fresh; fall back to cache offline.
+  if (url.pathname.includes('/data/') && url.pathname.endsWith('.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((resp) => {
+          const copy = resp.clone();
+          caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+          return resp;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // App shell: cache-first.
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;

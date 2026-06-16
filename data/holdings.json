@@ -1,0 +1,20 @@
+{
+  "currency": "USD",
+  "cash": 25,
+  "holdings": [
+    {
+      "symbol": "TSLA",
+      "name": "TESLA INC",
+      "exchange": "NASDAQ.NMS",
+      "shares": 4.8746,
+      "invested": 2052.25
+    },
+    {
+      "symbol": "VOO",
+      "name": "VANGUARD S&P 500 ETF",
+      "exchange": "ARCA",
+      "shares": 72.1739,
+      "invested": 34704.00
+    }
+  ]
+}

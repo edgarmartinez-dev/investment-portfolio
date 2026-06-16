@@ -1,0 +1,48 @@
+{
+  "updatedAt": "2026-06-16T16:21:02.955Z",
+  "currency": "USD",
+  "totalValue": 52015.08,
+  "holdingsValue": 51990.08,
+  "cash": 25,
+  "totalInvested": 36756.25,
+  "today": {
+    "change": 1144.17,
+    "changePct": 2.25
+  },
+  "total": {
+    "change": 15233.83,
+    "changePct": 41.45
+  },
+  "holdings": [
+    {
+      "symbol": "TSLA",
+      "name": "TESLA INC",
+      "exchange": "NASDAQ.NMS",
+      "shares": 4.8746,
+      "invested": 2052.25,
+      "price": 407.015,
+      "prevClose": 396.68,
+      "value": 1984.04,
+      "pl": -68.21,
+      "plPct": -3.32,
+      "dayChange": 50.38,
+      "dayChangePct": 2.61,
+      "source": "yahoo"
+    },
+    {
+      "symbol": "VOO",
+      "name": "VANGUARD S&P 500 ETF",
+      "exchange": "ARCA",
+      "shares": 72.1739,
+      "invested": 34704,
+      "price": 692.855,
+      "prevClose": 677.7,
+      "value": 50006.05,
+      "pl": 15302.05,
+      "plPct": 44.09,
+      "dayChange": 1093.8,
+      "dayChangePct": 2.24,
+      "source": "yahoo"
+    }
+  ]
+}
