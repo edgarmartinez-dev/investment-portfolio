@@ -24,14 +24,16 @@ async function writeJson(path, data) {
 }
 
 async function quoteYahoo(symbol) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`;
+  // range=1d so chartPreviousClose is YESTERDAY's close (range=5d returns the
+  // close from ~a week ago, which turns "today's change" into a 5-day change).
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
   const res = await fetch(url, { headers: { 'User-Agent': UA } });
   if (!res.ok) throw new Error(`yahoo HTTP ${res.status}`);
   const json = await res.json();
   const meta = json?.chart?.result?.[0]?.meta;
   const price = meta?.regularMarketPrice;
   if (!price) throw new Error('yahoo: no price');
-  const prevClose = meta.chartPreviousClose ?? meta.previousClose ?? price;
+  const prevClose = meta.previousClose ?? meta.chartPreviousClose ?? price;
   return { price, prevClose };
 }
 
