@@ -1,6 +1,6 @@
 // App version (semver). Bump to ship updates and bust the old cache:
 // patch (x.x.+1) for fixes, minor (x.+1.0) for features, major for big changes.
-const VERSION = '7.1.0';
+const VERSION = '7.2.0';
 const CACHE = 'portfolio-' + VERSION;
 const ASSETS = [
   './',

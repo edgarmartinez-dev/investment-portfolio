@@ -308,6 +308,17 @@
   .t-input{ display:flex; align-items:center; border:1.5px solid #e6e8eb; border-radius:11px; padding:0 14px; }
   .t-input:focus-within{ border-color:var(--blue); }
   .t-input .pre{ color:var(--grey2); font-size:18px; font-weight:600; }
+  .t-input .search-ic{ width:20px;height:20px;color:var(--grey-light);flex:none;margin-right:10px; }
+  .stock-list{ max-height:232px;overflow-y:auto;border:1.5px solid #e6e8eb;border-radius:11px;margin-top:10px;-webkit-overflow-scrolling:touch; }
+  .stock-row{ display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--line); }
+  .stock-row:last-child{ border-bottom:none; }
+  .stock-row.sel, .stock-row:active{ background:#eef3ff; }
+  .stock-row .left{ min-width:0; }
+  .stock-row .sym{ font-size:16px;font-weight:700; }
+  .stock-row .nm{ font-size:13px;color:var(--grey2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .stock-row .pr{ font-size:14px;font-weight:600;color:var(--grey2);white-space:nowrap;flex:none; }
+  .stock-row .live{ color:var(--green); }
+  .stock-empty{ padding:16px;color:var(--grey-light);font-size:14px;text-align:center; }
   .t-input input, .t-input select{ flex:1; border:none; outline:none; font-size:18px; font-weight:600; padding:13px 0; background:none; color:var(--black); -webkit-appearance:none; appearance:none; }
   .t-input select{ cursor:pointer; }
   .t-input .suf{ color:var(--grey2); font-size:14px; }
@@ -436,10 +447,12 @@
     </div>
     <div class="t-body">
       <div class="field">
-        <label for="instSel">Instrument</label>
+        <label for="instSearch">Instrument</label>
         <div class="t-input">
-          <select id="instSel"></select>
+          <svg class="search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="instSearch" type="text" placeholder="Search symbol or name" autocomplete="off" spellcheck="false" />
         </div>
+        <div class="stock-list" id="stockList"></div>
         <div class="t-price" id="instPrice"></div>
       </div>
 
@@ -647,7 +660,8 @@
 
     /* ---------- Trade / order screen (mockup) ---------- */
     var tradeScreen = document.getElementById('tradeScreen');
-    var instSel = document.getElementById('instSel');
+    var instSearch = document.getElementById('instSearch');
+    var stockList = document.getElementById('stockList');
     var instPrice = document.getElementById('instPrice');
     var sideSeg = document.getElementById('sideSeg');
     var typeSeg = document.getElementById('typeSeg');
@@ -656,37 +670,87 @@
     var limitInp = document.getElementById('limitInp');
     var estTotal = document.getElementById('estTotal');
     var placeBtn = document.getElementById('placeBtn');
-    var side = 'BUY', otype = 'MARKET';
+    var side = 'BUY', otype = 'MARKET', selectedSym = 'TSLA';
 
     var money2 = function (v) {
       return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
-    function instruments() {
+    // Searchable list (mockup). Live prices from the portfolio override these.
+    var STOCKS = [
+      { symbol: 'AAPL', name: 'Apple Inc', price: 228.5 },
+      { symbol: 'MSFT', name: 'Microsoft Corp', price: 472.1 },
+      { symbol: 'NVDA', name: 'NVIDIA Corp', price: 178.3 },
+      { symbol: 'AMZN', name: 'Amazon.com Inc', price: 221.0 },
+      { symbol: 'GOOGL', name: 'Alphabet Inc', price: 201.4 },
+      { symbol: 'META', name: 'Meta Platforms', price: 735.2 },
+      { symbol: 'TSLA', name: 'Tesla Inc', price: 404.5 },
+      { symbol: 'AVGO', name: 'Broadcom Inc', price: 1720.0 },
+      { symbol: 'JPM', name: 'JPMorgan Chase', price: 290.6 },
+      { symbol: 'V', name: 'Visa Inc', price: 355.8 },
+      { symbol: 'WMT', name: 'Walmart Inc', price: 104.2 },
+      { symbol: 'XOM', name: 'Exxon Mobil', price: 118.7 },
+      { symbol: 'NFLX', name: 'Netflix Inc', price: 1280.0 },
+      { symbol: 'AMD', name: 'Advanced Micro Devices', price: 168.9 },
+      { symbol: 'DIS', name: 'Walt Disney Co', price: 115.3 },
+      { symbol: 'KO', name: 'Coca-Cola Co', price: 71.4 },
+      { symbol: 'NKE', name: 'Nike Inc', price: 78.6 },
+      { symbol: 'SBUX', name: 'Starbucks Corp', price: 97.2 },
+      { symbol: 'UBER', name: 'Uber Technologies', price: 88.1 },
+      { symbol: 'COIN', name: 'Coinbase Global', price: 312.5 },
+      { symbol: 'VOO', name: 'Vanguard S&P 500 ETF', price: 692.0 },
+      { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 655.0 },
+      { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 588.0 },
+      { symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', price: 312.0 }
+    ];
+    var liveSet = {};
+    function applyLivePrices() {
       try {
         var p = JSON.parse(localStorage.getItem('portfolio') || 'null');
-        if (p && p.holdings && p.holdings.length) {
-          return p.holdings.map(function (h) { return { symbol: h.symbol, name: h.name, price: h.price }; });
+        if (p && p.holdings) {
+          p.holdings.forEach(function (h) {
+            var s = stockBy(h.symbol);
+            if (s) { s.price = h.price; if (h.name) s.name = h.name; }
+            else STOCKS.push({ symbol: h.symbol, name: h.name, price: h.price });
+            liveSet[h.symbol] = true;
+          });
         }
       } catch (e) {}
-      return [{ symbol: 'TSLA', name: 'TESLA INC', price: 0 }, { symbol: 'VOO', name: 'VANGUARD S&P 500 ETF', price: 0 }];
     }
-    function fillInstruments() {
-      instSel.innerHTML = instruments().map(function (i) {
-        return '<option value="' + i.symbol + '" data-price="' + (i.price || 0) + '">' + i.symbol + ' — ' + (i.name || '') + '</option>';
+    function stockBy(sym) { for (var i = 0; i < STOCKS.length; i++) if (STOCKS[i].symbol === sym) return STOCKS[i]; }
+    function selPrice() { var s = stockBy(selectedSym); return s ? (s.price || 0) : 0; }
+
+    function buildList(q) {
+      q = (q || '').trim().toLowerCase();
+      var rows = STOCKS.filter(function (s) {
+        return !q || s.symbol.toLowerCase().indexOf(q) >= 0 || s.name.toLowerCase().indexOf(q) >= 0;
+      });
+      if (!rows.length) { stockList.innerHTML = '<div class="stock-empty">No matches</div>'; return; }
+      stockList.innerHTML = rows.map(function (s) {
+        return '<div class="stock-row' + (s.symbol === selectedSym ? ' sel' : '') + '" data-sym="' + s.symbol + '">' +
+          '<div class="left"><div class="sym">' + s.symbol + '</div><div class="nm">' + s.name + '</div></div>' +
+          '<div class="pr' + (liveSet[s.symbol] ? ' live' : '') + '">' + (s.price ? money2(s.price) : '—') + '</div></div>';
       }).join('');
     }
-    function selPrice() {
-      var o = instSel.options[instSel.selectedIndex];
-      return o ? (parseFloat(o.getAttribute('data-price')) || 0) : 0;
-    }
+
     function recalc() {
       var price = otype === 'LIMIT' ? (parseFloat(limitInp.value) || 0) : selPrice();
       var qty = parseFloat(qtyInp.value) || 0;
-      instPrice.textContent = selPrice() ? 'Market price ' + money2(selPrice()) : '';
+      var s = stockBy(selectedSym);
+      instPrice.textContent = s ? (s.symbol + (selPrice() ? ' · market ' + money2(selPrice()) : '')) : '';
       estTotal.textContent = (price && qty) ? money2(price * qty) : '$0';
       placeBtn.disabled = !(qty > 0 && price > 0);
     }
+
+    if (stockList) stockList.addEventListener('click', function (e) {
+      var row = e.target.closest('.stock-row'); if (!row) return;
+      selectedSym = row.getAttribute('data-sym');
+      [].forEach.call(stockList.querySelectorAll('.stock-row'), function (r) {
+        r.classList.toggle('sel', r.getAttribute('data-sym') === selectedSym);
+      });
+      recalc();
+    });
+    if (instSearch) instSearch.addEventListener('input', function () { buildList(instSearch.value); });
     function wireSeg(seg, cb) {
       if (!seg) return;
       seg.addEventListener('click', function (e) {
@@ -706,7 +770,6 @@
       limitField.classList.toggle('hidden', otype !== 'LIMIT');
       recalc();
     });
-    if (instSel) instSel.addEventListener('change', recalc);
     if (qtyInp) qtyInp.addEventListener('input', recalc);
     if (limitInp) limitInp.addEventListener('input', recalc);
 
@@ -720,7 +783,9 @@
 
     // Navigation (hash-based so the device/browser back works too).
     function openTrade() {
-      fillInstruments(); recalc();
+      applyLivePrices();
+      if (instSearch) instSearch.value = '';
+      buildList(''); recalc();
       document.documentElement.classList.add('trading');
       if (tradeScreen) { tradeScreen.classList.add('open'); tradeScreen.setAttribute('aria-hidden', 'false'); }
     }
