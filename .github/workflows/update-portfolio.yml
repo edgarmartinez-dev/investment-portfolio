@@ -2,9 +2,10 @@ name: Update portfolio data
 
 on:
   schedule:
-    # Every 15 minutes. GitHub may delay/skip scheduled runs under load, so
-    # treat this as "best effort", not guaranteed exactly every 15 minutes.
-    - cron: '*/15 * * * *'
+    # Every 15 minutes, offset off the congested :00/:15/:30/:45 marks to
+    # improve GitHub's odds of actually running it (scheduled runs are
+    # best-effort and GitHub delays/drops them, especially at round times).
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch: {}
 
 permissions:
