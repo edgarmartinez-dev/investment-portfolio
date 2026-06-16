@@ -14,6 +14,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Portfolio">
 <style>
+  @font-face{ font-family:'Proxima Nova'; font-style:normal; font-weight:500;
+    src:url('fonts/ProximaNova-Medium.woff2') format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Proxima Nova'; font-style:normal; font-weight:600;
+    src:url('fonts/ProximaNova-Semibold.woff2') format('woff2'); font-display:swap; }
+  @font-face{ font-family:'Proxima Nova'; font-style:normal; font-weight:700;
+    src:url('fonts/ProximaNova-Bold.woff2') format('woff2'); font-display:swap; }
+
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
   :root{
@@ -42,7 +49,8 @@
 
   html,body{
     background:#ffffff;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:'Proxima Nova',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-weight:500;
     color:var(--black);
     display:flex;
     justify-content:center;
