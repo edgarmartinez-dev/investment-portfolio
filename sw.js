@@ -1,6 +1,6 @@
 // App version (semver). Bump to ship updates and bust the old cache:
 // patch (x.x.+1) for fixes, minor (x.+1.0) for features, major for big changes.
-const VERSION = '7.5.0';
+const VERSION = '7.5.1';
 const CACHE = 'portfolio-' + VERSION;
 const ASSETS = [
   './',
@@ -11,6 +11,7 @@ const ASSETS = [
   './icon-512-maskable.png',
   './apple-touch-icon.png',
   './data/portfolio.json',
+  './fonts/ProximaNova-Regular.woff2',
   './fonts/ProximaNova-Medium.woff2',
   './fonts/ProximaNova-Semibold.woff2',
   './fonts/ProximaNova-Bold.woff2'

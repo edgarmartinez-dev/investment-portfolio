@@ -14,6 +14,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Portfolio">
 <style>
+  @font-face{ font-family:'Proxima Nova'; font-style:normal; font-weight:400;
+    src:url('fonts/ProximaNova-Regular.woff2') format('woff2'); font-display:swap; }
   @font-face{ font-family:'Proxima Nova'; font-style:normal; font-weight:500;
     src:url('fonts/ProximaNova-Medium.woff2') format('woff2'); font-display:swap; }
   @font-face{ font-family:'Proxima Nova'; font-style:normal; font-weight:600;
@@ -116,7 +118,7 @@
     align-items:flex-start;
     padding:6px 22px 16px 22px;
   }
-  .pv-label{ display:flex;align-items:center;gap:6px;font-size:16px;color:#000;margin-bottom:2px;}
+  .pv-label{ display:flex;align-items:center;gap:7px;font-size:15px;font-weight:400;letter-spacing:.1px;color:#000;margin-bottom:1px;}
   .pv-label .info{ width:15px;height:15px; }
   .pv-amount{ font-size:36px;font-weight:700;letter-spacing:-1.3px;line-height:1.05; }
 
@@ -145,6 +147,7 @@
     padding:0 22px 12px 22px;
     color:var(--grey-light);
     font-size:14px;
+    font-weight:400;
   }
   .col-head > *, .row > *{ min-width:0; }
   .col-head .c1{ display:flex;align-items:center;gap:5px; }
@@ -576,7 +579,7 @@
         if (pl) pl.classList.toggle('neg', h.pl < 0);
       });
 
-      if (typeof d.cash === 'number') set(document.getElementById('cashAmt'), fmtK(d.cash));
+      if (typeof d.cash === 'number') set(document.getElementById('cashAmt'), '$' + fmtK(d.cash));
     }
 
     var reveal = function () { document.documentElement.classList.remove('data-loading'); };
