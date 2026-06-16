@@ -177,7 +177,7 @@
     display:flex;align-items:center;justify-content:center;color:var(--grey-light);font-size:14px;
   }
   .cash-row{
-    display:flex;align-items:center;padding:16px 22px 18px 22px;gap:18px;
+    display:flex;align-items:center;padding:16px 22px 18px 22px;gap:14px;
   }
   .flag-wrap{ position:relative;width:46px;height:31px;flex:none; }
   .flag{ width:46px;height:31px;border-radius:3px;overflow:hidden;display:block;box-shadow:0 0 0 .5px rgba(0,0,0,.08); }
@@ -186,12 +186,12 @@
     background:#23c552;border:2px solid #fff;display:flex;align-items:center;justify-content:center;
   }
   .check svg{ width:11px;height:11px;color:#fff; }
-  .cash-info{ flex:1; }
+  .cash-info{ flex:1 1 auto;min-width:0; }
   .cash-info .cur{ font-size:19px;font-weight:700; }
-  .cash-info .sub{ font-size:15px;color:var(--grey2);margin-top:2px;white-space:nowrap; }
-  .cash-amt{ font-size:21px;font-weight:700;margin-right:14px; }
+  .cash-info .sub{ font-size:15px;color:var(--grey2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .cash-amt{ font-size:21px;font-weight:700;margin-right:10px;flex:none;white-space:nowrap; }
   .dots{
-    width:88px;height:42px;border-radius:21px;background:#e7ebef;
+    width:80px;height:42px;border-radius:21px;background:#e7ebef;
     display:flex;align-items:center;justify-content:center;gap:6px;flex:none;
   }
   .dots i{ width:6px;height:6px;border-radius:50%;background:#a7abb0;display:block; }
