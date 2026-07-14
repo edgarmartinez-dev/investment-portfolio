@@ -1,17 +1,17 @@
 {
-  "updatedAt": "2026-07-14T18:13:23.836Z",
+  "updatedAt": "2026-07-14T19:47:46.084Z",
   "currency": "USD",
-  "totalValue": 51873.56,
-  "holdingsValue": 51848.56,
+  "totalValue": 51864.01,
+  "holdingsValue": 51839.01,
   "cash": 25,
   "totalInvested": 36756.25,
   "today": {
-    "change": 232.53,
-    "changePct": 0.45
+    "change": 222.99,
+    "changePct": 0.43
   },
   "total": {
-    "change": 15092.31,
-    "changePct": 41.06
+    "change": 15082.76,
+    "changePct": 41.03
   },
   "holdings": [
     {
@@ -20,13 +20,13 @@
       "exchange": "NASDAQ.NMS",
       "shares": 4.8746,
       "invested": 2052.25,
-      "price": 396.12,
+      "price": 396.16,
       "prevClose": 394.76,
-      "value": 1930.93,
-      "pl": -121.32,
-      "plPct": -5.91,
-      "dayChange": 6.63,
-      "dayChangePct": 0.34,
+      "value": 1931.12,
+      "pl": -121.13,
+      "plPct": -5.9,
+      "dayChange": 6.82,
+      "dayChangePct": 0.35,
       "source": "yahoo"
     },
     {
@@ -35,13 +35,13 @@
       "exchange": "ARCA",
       "shares": 72.1739,
       "invested": 34704,
-      "price": 691.63,
+      "price": 691.495,
       "prevClose": 688.5,
-      "value": 49917.63,
-      "pl": 15213.63,
-      "plPct": 43.84,
-      "dayChange": 225.9,
-      "dayChangePct": 0.45,
+      "value": 49907.89,
+      "pl": 15203.89,
+      "plPct": 43.81,
+      "dayChange": 216.16,
+      "dayChangePct": 0.44,
       "source": "yahoo"
     }
   ]
