@@ -859,5 +859,26 @@
         "shares": 72.1739
       }
     }
+  },
+  {
+    "date": "2026-07-27",
+    "updatedAt": "2026-07-27T00:16:28.691Z",
+    "totalValue": 50567.08,
+    "totalInvested": 36756.25,
+    "totalPL": 13785.83,
+    "holdings": {
+      "TSLA": {
+        "price": 313.03,
+        "value": 1525.9,
+        "pl": -526.35,
+        "shares": 4.8746
+      },
+      "VOO": {
+        "price": 679.14,
+        "value": 49016.18,
+        "pl": 14312.18,
+        "shares": 72.1739
+      }
+    }
   }
 ]
