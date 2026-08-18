@@ -1,17 +1,17 @@
 {
-  "updatedAt": "2026-08-18T20:01:24.506Z",
+  "updatedAt": "2026-08-18T20:39:25.888Z",
   "currency": "USD",
-  "totalValue": 52573.52,
-  "holdingsValue": 52548.52,
+  "totalValue": 52578.58,
+  "holdingsValue": 52553.58,
   "cash": 25,
   "totalInvested": 36756.25,
   "today": {
-    "change": -368.38,
-    "changePct": -0.7
+    "change": -363.33,
+    "changePct": -0.69
   },
   "total": {
-    "change": 15792.27,
-    "changePct": 42.96
+    "change": 15797.33,
+    "changePct": 42.98
   },
   "holdings": [
     {
@@ -35,13 +35,13 @@
       "exchange": "ARCA",
       "shares": 72.1739,
       "invested": 34704,
-      "price": 705.33,
+      "price": 705.4,
       "prevClose": 710.27,
-      "value": 50906.42,
-      "pl": 16202.42,
-      "plPct": 46.69,
-      "dayChange": -356.54,
-      "dayChangePct": -0.7,
+      "value": 50911.47,
+      "pl": 16207.47,
+      "plPct": 46.7,
+      "dayChange": -351.49,
+      "dayChangePct": -0.69,
       "source": "yahoo"
     }
   ]
