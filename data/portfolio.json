@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-26T10:24:27.136Z",
+  "updatedAt": "2026-08-26T11:04:17.721Z",
   "currency": "USD",
   "totalValue": 52544.2,
   "holdingsValue": 52519.2,
@@ -27,7 +27,7 @@
       "plPct": -16.81,
       "dayChange": 6.34,
       "dayChangePct": 0.37,
-      "source": "cached"
+      "source": "yahoo"
     },
     {
       "symbol": "VOO",
