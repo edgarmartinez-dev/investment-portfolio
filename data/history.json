@@ -1681,21 +1681,21 @@
   },
   {
     "date": "2026-09-04",
-    "updatedAt": "2026-09-04T18:18:54.010Z",
-    "totalValue": 53022.3,
+    "updatedAt": "2026-09-04T20:51:10.734Z",
+    "totalValue": 53051.06,
     "totalInvested": 36956.25,
-    "totalPL": 16041.05,
+    "totalPL": 16069.81,
     "holdings": {
       "TSLA": {
-        "price": 353.68,
-        "value": 1724.05,
-        "pl": -328.2,
+        "price": 354.08,
+        "value": 1726,
+        "pl": -326.25,
         "shares": 4.8746
       },
       "VOO": {
-        "price": 707.64,
-        "value": 51273.25,
-        "pl": 16369.25,
+        "price": 708.01,
+        "value": 51300.06,
+        "pl": 16396.06,
         "shares": 72.45668943
       }
     }
