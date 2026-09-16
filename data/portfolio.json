@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-15T22:08:06.911Z",
+  "updatedAt": "2026-09-16T00:28:54.698Z",
   "currency": "USD",
   "totalValue": 52207.53,
   "holdingsValue": 52182.53,
@@ -42,7 +42,7 @@
       "plPct": 44.52,
       "dayChange": -224.62,
       "dayChangePct": -0.44,
-      "source": "yahoo"
+      "source": "cached"
     }
   ]
 }
